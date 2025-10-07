@@ -3,98 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jamal's Video Button</title>
-    <!-- Load Tailwind CSS from CDN for easy styling -->
+    <title>Background Image Page</title>
+    <!-- Load Tailwind CSS for simple, clean styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load the Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Custom CSS to ensure the video covers the entire viewport nicely */
-        #backgroundVideo {
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            object-fit: cover; /* Ensures the video covers the area without distorting aspect ratio */
+        /* Apply Inter font and make the body take up the full viewport height */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            /* --- Background Image Settings --- */
+            /* This references your requested file name, BG.png */
+            background-image: url('BG.png');
+            
+            /* Ensures the image covers the whole screen without tiling */
+            background-size: cover; 
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed; /* Keeps the background fixed */
+            background-color: #1f2937; /* Fallback solid color */
         }
     </style>
 </head>
-<body class="bg-gray-900 font-sans antialiased text-white">
-
-    <!-- 
-        1. Background Video Element
-        It is initially hidden (hidden class) and fixed to cover the entire screen (fixed top-0 left-0 w-full h-full).
-        The z-0 ensures it stays behind the content container.
-        *** IMPORTANT: Ensure 'Download.mp4' is in the same folder as this HTML file. ***
-    -->
-    <video id="backgroundVideo" class="hidden fixed top-0 left-0 w-full h-full z-0" preload="auto">
-        <!-- 
-            Placeholder for the user's video file. 
-            The 'preload="auto"' hint helps the browser load it faster.
-        -->
-        <source src="Download.mp4" type="video/mp4">
-        Your browser does not support the video tag. Please check the video file source.
-    </video>
-
-    <!-- 
-        2. Content Container
-        This container holds the button and is centered on the screen (flex items-center justify-center h-screen).
-        The z-10 ensures it stays above the video.
-    -->
-    <div id="contentContainer" class="relative z-10 flex items-center justify-center h-screen transition-opacity duration-300">
-        <button 
-            id="jamalButton" 
-            class="px-10 py-5 bg-indigo-600 text-white text-3xl font-bold rounded-xl shadow-2xl 
-                   hover:bg-indigo-700 active:bg-indigo-800 transition transform hover:scale-105 
-                   focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50
-                   shadow-indigo-500/50"
-        >
-            Jamal
-        </button>
+<body>
+    <!-- Placeholder content centered on the page for visibility -->
+    <div class="bg-white/90 p-10 rounded-2xl shadow-2xl max-w-md w-full mx-4 text-center transform transition duration-500 hover:scale-[1.02]">
+        <h1 class="text-4xl font-extrabold text-indigo-700 mb-4">Background Set!</h1>
+        <p class="text-gray-600 text-lg">
+            This page is configured to use **BG.png** as its full-screen background.
+        </p>
+        <p class="mt-6 text-sm text-red-500 font-medium">
+            Remember: Place a file named **BG.png** in the same folder as this HTML file to view it!
+        </p>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const videoElement = document.getElementById('backgroundVideo');
-            const contentContainer = document.getElementById('contentContainer');
-            const jamalButton = document.getElementById('jamalButton');
-
-            /**
-             * Handles the button click: Hides the button and starts the video.
-             */
-            jamalButton.addEventListener('click', () => {
-                // 1. Hide the button container immediately
-                contentContainer.classList.add('hidden');
-
-                // 2. Show the video element
-                videoElement.classList.remove('hidden');
-                
-                // 3. Attempt to play the video
-                videoElement.currentTime = 0; // Start from the beginning
-                videoElement.play().catch(error => {
-                    // This catch handles errors if the browser blocks playback (e.g., if it needs to be muted)
-                    console.error("Video playback failed:", error);
-                    
-                    // Fallback: If play fails, immediately revert to the button view
-                    videoElement.classList.add('hidden');
-                    contentContainer.classList.remove('hidden');
-                    
-                    // Display a temporary message to the user (using console instead of alert)
-                    console.warn("Could not play the video. Ensure the file 'Download.mp4' is correctly placed and accessible.");
-                });
-            });
-
-            /**
-             * Handles the video end event: Hides the video and brings the button back.
-             */
-            videoElement.addEventListener('ended', () => {
-                // 1. Pause and hide the video
-                videoElement.pause();
-                videoElement.classList.add('hidden');
-
-                // 2. Show the button container again
-                contentContainer.classList.remove('hidden');
-            });
-        });
-    </script>
-
 </body>
 </html>
