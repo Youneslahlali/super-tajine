@@ -3,118 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Background Image</title>
+    <title>Horizontal Scroll Background</title>
     <style>
-        /* Styles for the blank page container */
-        body {
+        /* Reset default browser margins and padding */
+        body, html {
             margin: 0;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden; /* Hides scrollbars when image is dragged off-screen */
-            background-color: #1f2937; /* Fallback color if image fails to load */
-            cursor: grab; /* Visual cue that the element is draggable */
+            padding: 0;
+            height: 100%; /* Important for setting a reference height */
+            width: 100%;
+            overflow-y: hidden; /* Hide vertical scrollbar */
+            overflow-x: auto; /* Enable horizontal scrollbar */
         }
-        
-        /* Styles for the image element */
-        #interactiveBackground {
-            position: fixed;
-            top: 0;
-            left: 0;
-            /* Make the image cover the viewport initially, similar to background-size: cover */
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
+
+        /* The container for the background image */
+        .background-container {
+            /* Set the height to 100% of the viewport height (vh) */
+            height: 100vh;
             
-            /* Start state and transform settings */
-            transform: translate(0px, 0px) scale(1);
-            transform-origin: 0 0; /* Ensures scaling is relative to the top-left corner */
+            /* Since the image is 16:9, we calculate the required width 
+               to maintain the aspect ratio based on the height (100vh)
+               Width = Height * (Aspect Ratio Width / Aspect Ratio Height)
+               Width = 100vh * (16 / 9) ≈ 177.78vh
+            */
+            width: 177.78vh; 
             
-            /* Disable native dragging and selection */
-            user-select: none;
-            -webkit-user-drag: none;
+            /* Set the background image */
+            background-image: url('BG.webp');
             
-            /* Smoother animation for movement */
-            transition: transform 0.05s ease-out;
+            /* Ensure the image covers the entire container */
+            background-size: cover; 
+            
+            /* Center the background image */
+            background-position: center; 
+            
+            /* Prevent the image from tiling */
+            background-repeat: no-repeat;
         }
     </style>
 </head>
 <body>
-    <!-- 
-        We use an <img> tag instead of a CSS background to allow for 
-        real-time manipulation of its position and scale via JavaScript. 
-    -->
-    <img id="interactiveBackground" src="BG.webp" alt="Draggable Background Image">
-
-    <script>
-        const img = document.getElementById('interactiveBackground');
-        
-        // State variables
-        let scale = 1;      // Current zoom level
-        let offsetX = 0;    // Current X position
-        let offsetY = 0;    // Current Y position
-        let isDragging = false;
-        let startX = 0;     // Mouse X position when drag started
-        let startY = 0;     // Mouse Y position when drag started
-
-        // Function to apply current state to the image's CSS transform property
-        function applyTransform() {
-            img.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
-        }
-
-        // --- Panning / Dragging Logic ---
-        
-        // Start dragging
-        document.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            // Calculate the starting position relative to the current offset
-            startX = e.clientX - offsetX;
-            startY = e.clientY - offsetY;
-            document.body.style.cursor = 'grabbing';
-        });
-
-        // Handle dragging movement
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            
-            // Calculate new offset based on current mouse position and starting offset
-            offsetX = e.clientX - startX;
-            offsetY = e.clientY - startY;
-            applyTransform();
-        });
-
-        // Stop dragging
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-            document.body.style.cursor = 'grab';
-        });
-        
-        // --- Zooming Logic (using mouse wheel) ---
-
-        document.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            
-            // Zoom parameters
-            const zoomIntensity = 0.1;
-            const delta = e.deltaY < 0 ? zoomIntensity : -zoomIntensity; // Determine zoom direction
-            
-            // Calculate new scale, clamping to a reasonable range
-            const newScale = Math.max(0.1, Math.min(10, scale + delta)); 
-            
-            if (newScale === scale) return; // No change
-
-            // Calculate current cursor position relative to the image element's position (0, 0)
-            const rect = img.getBoundingClientRect();
-            const cursorX = e.clientX - rect.left;
-            const cursorY = e.clientY - rect.top;
-
-            // Adjust offsets to keep the point under the cursor stationary during zoom (zoom-to-cursor)
-            offsetX -= cursorX * (newScale - scale);
-            offsetY -= cursorY * (newScale - scale);
-            
-            scale = newScale;
-            applyTransform();
-        });
-    </script>
+    <div class="background-container">
+        </div>
 </body>
 </html>
