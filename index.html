@@ -3,26 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blank Background Page</title>
+    <title>Interactive Background Image</title>
     <style>
+        /* Styles for the blank page container */
         body {
-            /* Removes default margins */
             margin: 0;
-            /* Ensures the body covers the entire screen */
             height: 100vh;
             width: 100vw;
+            overflow: hidden; /* Hides scrollbars when image is dragged off-screen */
+            background-color: #1f2937; /* Fallback color if image fails to load */
+            cursor: grab; /* Visual cue that the element is draggable */
+        }
+        
+        /* Styles for the image element */
+        #interactiveBackground {
+            position: fixed;
+            top: 0;
+            left: 0;
+            /* Make the image cover the viewport initially, similar to background-size: cover */
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
             
-            /* Background settings for BG.png */
-            background-image: url('BG.webp');
-            background-size: cover; 
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-attachment: fixed;
-            background-color: #1f2937;
+            /* Start state and transform settings */
+            transform: translate(0px, 0px) scale(1);
+            transform-origin: 0 0; /* Ensures scaling is relative to the top-left corner */
+            
+            /* Disable native dragging and selection */
+            user-select: none;
+            -webkit-user-drag: none;
+            
+            /* Smoother animation for movement */
+            transition: transform 0.05s ease-out;
         }
     </style>
 </head>
 <body>
-    
+    <!-- 
+        We use an <img> tag instead of a CSS background to allow for 
+        real-time manipulation of its position and scale via JavaScript. 
+    -->
+    <img id="interactiveBackground" src="BG.png" alt="Draggable Background Image">
+
+    <script>
+        const img = document.getElementById('interactiveBackground');
+        
+        // State variables
+        let scale = 1;      // Current zoom level
+        let offsetX = 0;    // Current X position
+        let offsetY = 0;    // Current Y position
+        let isDragging = false;
+        let startX = 0;     // Mouse X position when drag started
+        let startY = 0;     // Mouse Y position when drag started
+
+        // Function to apply current state to the image's CSS transform property
+        function applyTransform() {
+            img.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+        }
+
+        // --- Panning / Dragging Logic ---
+        
+        // Start dragging
+        document.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            // Calculate the starting position relative to the current offset
+            startX = e.clientX - offsetX;
+            startY = e.clientY - offsetY;
+            document.body.style.cursor = 'grabbing';
+        });
+
+        // Handle dragging movement
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            // Calculate new offset based on current mouse position and starting offset
+            offsetX = e.clientX - startX;
+            offsetY = e.clientY - startY;
+            applyTransform();
+        });
+
+        // Stop dragging
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            document.body.style.cursor = 'grab';
+        });
+        
+        // --- Zooming Logic (using mouse wheel) ---
+
+        document.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            
+            // Zoom parameters
+            const zoomIntensity = 0.1;
+            const delta = e.deltaY < 0 ? zoomIntensity : -zoomIntensity; // Determine zoom direction
+            
+            // Calculate new scale, clamping to a reasonable range
+            const newScale = Math.max(0.1, Math.min(10, scale + delta)); 
+            
+            if (newScale === scale) return; // No change
+
+            // Calculate current cursor position relative to the image element's position (0, 0)
+            const rect = img.getBoundingClientRect();
+            const cursorX = e.clientX - rect.left;
+            const cursorY = e.clientY - rect.top;
+
+            // Adjust offsets to keep the point under the cursor stationary during zoom (zoom-to-cursor)
+            offsetX -= cursorX * (newScale - scale);
+            offsetY -= cursorY * (newScale - scale);
+            
+            scale = newScale;
+            applyTransform();
+        });
+    </script>
 </body>
 </html>
